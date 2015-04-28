@@ -1996,6 +1996,10 @@ function find_best_player(team) {
 	return besti;
 }
 
+function find_random_player(team) {
+    return Math.floor(Math.random() * team.length);
+}
+
 // given a list of players, return index of the worst performer
 function find_worst_player(team) {
 	var worst = 10000000000; // an impossibly high player value, presumably
@@ -2029,6 +2033,7 @@ function clock_violation() {
 function game_over() {
 	// end the current play as if the playclock was up
 	clock_violation();
+        var loser;
 
 	// and do final score stuff, get ready for next match.
 	var fstring = "Game " + gamesplayed + ": " + teams.left.name3 + " " + teams.left.scores.points + ", " + teams.right.name3 + " " + teams.right.scores.points;
@@ -2044,10 +2049,12 @@ function game_over() {
 	else if(teams.left.scores.points > teams.right.scores.points) {
 		teams.left.won++;
 		teams.right.lost++;
+                loser = teams.right;
 	}
 	else {
 		teams.left.lost++;
 		teams.right.won++;
+                loser = teams.left;
 	}
 
 	///// HISTORICAL SCOREKEEPING /////
@@ -2093,6 +2100,11 @@ function game_over() {
 	var mutationrate = Number($("#mutationrateslider").val()) / 100;
 
 	var tm = [teams.left, teams.right];
+        if(loser == null) {
+          tm = [];
+        } else {
+          tm = [loser];
+        }
 	for(var k = 0; k < tm.length; k++) {
 		var t = tm[k];
 		if(t.played % gpf == 0) {
@@ -2112,7 +2124,7 @@ function game_over() {
 		//	console.log(t.name + " GM is firing " + replacing + " players");
 			for(var i = 0; i < replacing; i++) {
 				// cull this many players...
-				var firei = find_worst_player(keepers); // find a loser
+				var firei = find_random_player(keepers); // find a loser
 		//		console.log(keepers[firei].number + " " + keepers[firei].lastname + " is worst, with " + get_value(keepers[firei]) );
 				losers.push(keepers[firei]); // add them to losers
 				keepers.splice(firei, 1); // ditch them from keepers
